@@ -1,0 +1,18 @@
+Advanced Cyber Course - Part 4
+Automatic Vulnerability Scanner
+
+This report describes the results of running our automatic scanner
+on a target web application.
+
+Scans performed:
+- Web scan (ZAP)
+- API scan (Nuclei)
+- Static code scan (Semgrep)
+- Logic checks (IDOR)
+- AI-based analysis (Prompt Injection)
+
+Target:
+TBD
+
+Findings:
+TBD
