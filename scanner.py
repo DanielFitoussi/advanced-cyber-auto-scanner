@@ -1,6 +1,7 @@
 import sys
 from tools.zap_runner import run_zap_scan
 from tools.idor_check import run_idor_check
+from tools.nuclei_runner import run_nuclei_scan
 
 
 def main():
@@ -11,6 +12,7 @@ def main():
     target_url = sys.argv[1]
 
     run_zap_scan(target_url)
+    run_nuclei_scan(target_url)
     run_idor_check()
 
 
