@@ -60,6 +60,52 @@ def summarize_zap():
 
     return summary
 
+def zap_summary_to_list(zap_summary):
+    findings = []
+
+    for key, count in zap_summary.items():
+        if "(" in key:
+            name, risk = key.rsplit("(", 1)
+            risk = risk.replace(")", "").strip()
+            name = name.strip()
+        else:
+            name = key
+            risk = "Unknown"
+
+        findings.append({
+            "name": name,
+            "risk": risk,
+            "count": count
+        })
+
+    return findings
+
+
+def generate_readable_report(zap_findings, output_file="report.md"):
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("# Security Scan Report\n\n")
+        f.write("## OWASP ZAP Findings\n\n")
+
+        if not zap_findings:
+            f.write("No vulnerabilities found.\n")
+            return
+
+        severity_count = {}
+
+        for vuln in zap_findings:
+            name = vuln["name"]
+            risk = vuln["risk"]
+            count = vuln["count"]
+
+            severity_count[risk] = severity_count.get(risk, 0) + count
+
+            f.write(f"- **{name}**  \n")
+            f.write(f"  Severity: `{risk}`  \n")
+            f.write(f"  Occurrences: {count}\n\n")
+
+        f.write("## Summary\n\n")
+        for risk, count in severity_count.items():
+            f.write(f"- {risk}: {count}\n")
 
 # ========================
 # Main
@@ -93,6 +139,16 @@ def main():
     semgrep_issues = summarize_semgrep()
     zap_summary = summarize_zap()
     
+        # === Generate readable report ===
+    zap_findings_list = zap_summary_to_list(zap_summary)
+    generate_readable_report(zap_findings_list)
+
+    print("[+] report.md generated")
+
+    
+   
+
+    
     
     print("\n========================")
     print(" Scan Summary")
@@ -124,3 +180,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    
