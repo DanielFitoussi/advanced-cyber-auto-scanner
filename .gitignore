@@ -1,1 +1,3 @@
 *.exe
+zap_report.*
+semgrep_report.json
