@@ -31,8 +31,34 @@ def summarize_semgrep():
 
 
 def summarize_zap():
-    # בשלב זה רק בודקים אם הדוח קיים
-    return os.path.exists("zap_report.html")
+    report_file = "zap_report.json"
+
+    if not os.path.exists(report_file):
+        print("[!] ZAP JSON report not found")
+        return {}
+
+    try:
+        with open(report_file, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        print("[!] Failed to parse ZAP report:", e)
+        return {}
+
+    summary = {}
+
+    sites = data.get("site", [])
+    if not sites:
+        return summary
+
+    alerts = sites[0].get("alerts", [])
+
+    for alert in alerts:
+        name = alert.get("alert", "Unknown")
+        risk = alert.get("riskdesc", "Unknown")
+        key = f"{name} ({risk})"
+        summary[key] = summary.get(key, 0) + 1
+
+    return summary
 
 
 # ========================
@@ -65,7 +91,8 @@ def main():
 
     # === Summary ===
     semgrep_issues = summarize_semgrep()
-    zap_report_exists = summarize_zap()
+    zap_summary = summarize_zap()
+
 
     print("\n========================")
     print(" Scan Summary")
@@ -80,10 +107,13 @@ def main():
         print(f"Semgrep: {semgrep_issues} issues found")
 
     # ZAP summary
-    if zap_report_exists:
-        print("ZAP report generated: zap_report.html")
+    print("\nZAP Findings:")
+    if not zap_summary:
+     print("No ZAP issues found")
     else:
-        print("ZAP report not generated")
+      for issue, count in zap_summary.items():
+        print(f"- {issue}: {count}")
+
 
     print("------------------------")
     print("Scan completed.")

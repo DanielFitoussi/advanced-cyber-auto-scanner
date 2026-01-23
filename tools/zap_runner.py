@@ -15,21 +15,23 @@ def run_zap_scan(target_url):
 
     print("[*] Running OWASP ZAP baseline scan on:", target_url)
 
+    output_file = os.path.join(os.getcwd(), "zap_report.json")
+
     command = [
         ZAP_PATH,
         "-cmd",
         "-quickurl", target_url,
         "-quickprogress",
-        "-quickout", os.path.join(os.getcwd(), "zap_report.html")
-
+        "-quickout", output_file,
+        
     ]
 
     try:
         subprocess.run(
             command,
-            cwd=ZAP_DIR,   # ⭐ זה השינוי הקריטי ⭐
+            cwd=ZAP_DIR,
             check=True
         )
-        print("[+] ZAP scan finished. Report: zap_report.html")
+        print("[+] ZAP scan finished. Report: zap_report.json")
     except Exception as e:
         print("[!] ZAP scan failed:", e)
