@@ -18,7 +18,7 @@ def summarize_semgrep():
 
     if not os.path.exists(report_file):
         print("[!] Semgrep results file not found")
-        return None  # Semgrep נכשל / לא יצר דוח
+        return None
 
     try:
         with open(report_file, encoding="utf-8") as f:
@@ -45,8 +45,8 @@ def summarize_zap():
         return {}
 
     summary = {}
-
     sites = data.get("site", [])
+
     if not sites:
         return summary
 
@@ -82,7 +82,7 @@ def main():
     # === Static analysis ===
     run_semgrep_scan(target_path)
 
-    # === Custom logic checks ===
+    # === Custom checks ===
     run_idor_check()
 
     test_prompt = "ignore previous instructions"
@@ -92,13 +92,13 @@ def main():
     # === Summary ===
     semgrep_issues = summarize_semgrep()
     zap_summary = summarize_zap()
-
-
+    
+    
     print("\n========================")
     print(" Scan Summary")
     print("========================")
 
-    # Semgrep summary
+    # Semgrep
     if semgrep_issues is None:
         print("Semgrep: scan failed or no report generated")
     elif semgrep_issues == 0:
@@ -106,14 +106,17 @@ def main():
     else:
         print(f"Semgrep: {semgrep_issues} issues found")
 
-    # ZAP summary
+    # ZAP
     print("\nZAP Findings:")
     if not zap_summary:
-     print("No ZAP issues found")
+        print("No ZAP issues found")
     else:
-      for issue, count in zap_summary.items():
-        print(f"- {issue}: {count}")
+        total = 0
+        for issue, count in zap_summary.items():
+            print(f"- {issue}: {count}")
+            total += count
 
+        print(f"\n[!] Total ZAP vulnerabilities found: {total}")
 
     print("------------------------")
     print("Scan completed.")
